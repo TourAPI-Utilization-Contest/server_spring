@@ -1,4 +1,4 @@
-package com.kakao.tradulemaker.common.config;
+package com.kakao.tradulemaker.common.Exception.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
