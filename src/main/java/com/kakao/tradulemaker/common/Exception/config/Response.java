@@ -1,6 +1,6 @@
-package com.kakao.tradulemaker.definition.Exception.config;
+package com.kakao.tradulemaker.common.Exception.config;
 
-import com.kakao.tradulemaker.definition.Exception.ServiceDefinedException;
+import com.kakao.tradulemaker.common.Exception.ServiceDefinedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
