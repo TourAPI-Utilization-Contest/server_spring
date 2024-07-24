@@ -1,6 +1,6 @@
-package com.kakao.tradulemaker.common.Exception;
+package com.kakao.tradulemaker.definition.Exception;
 
-import com.kakao.tradulemaker.common.Exception.config.ErrorCode;
+import com.kakao.tradulemaker.definition.Exception.config.ErrorCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
