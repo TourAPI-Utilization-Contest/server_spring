@@ -3,11 +3,11 @@ package com.kakao.tradulemaker.oauth.dto.res;
 import lombok.Getter;
 
 @Getter
-public class TestDto {
+public class ConnectKakaoDto {
 
   private final String redirectUri;
 
-  public TestDto(String redirectUri) {
+  public ConnectKakaoDto(String redirectUri) {
     this.redirectUri = redirectUri;
   }
 }
