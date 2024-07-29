@@ -1,8 +1,11 @@
 package com.kakao.tradulemaker.oauth.controller;
 
+import com.kakao.tradulemaker.common.Exception.config.Response;
+import com.kakao.tradulemaker.oauth.dto.res.TokenDto;
 import com.kakao.tradulemaker.oauth.service.KakaoApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,8 +42,9 @@ public class OauthController {
   }
 
   @GetMapping("/authorize")
-  public ResponseEntity<String> logIn(@RequestParam String code) {
+  public ResponseEntity<TokenDto> logIn(@RequestParam String code) {
+    TokenDto tokenDto = kakaoApi.getTokens(uriForToken, code, clientId, clientSecret, redirectUri);
 
-    return kakaoApi.getTokens(uriForToken, code, clientId, clientSecret, redirectUri);
+    return Response.ok(HttpStatus.OK, tokenDto);
   }
 }

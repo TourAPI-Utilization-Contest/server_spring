@@ -1,10 +1,10 @@
 package com.kakao.tradulemaker.oauth.service;
 
+import com.kakao.tradulemaker.oauth.dto.res.TokenDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -26,7 +26,7 @@ public class KakaoApi {
             "&response_type=code";
   }
 
-  public ResponseEntity<String> getTokens(
+  public TokenDto getTokens(
           String baseUri,
           String code,
           String clientId,
@@ -45,10 +45,12 @@ public class KakaoApi {
 
     HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
-    return fetchPost(baseUri, entity);
+    String res = fetchPost(baseUri, entity);
+
+    return new TokenDto(res);
   }
 
-  private ResponseEntity<String> fetchPost(
+  private String fetchPost(
           String baseUri,
           HttpEntity<MultiValueMap<String, String>> entity
   ) {
@@ -58,6 +60,6 @@ public class KakaoApi {
             HttpMethod.POST,
             entity,
             String.class
-    );
+    ).getBody();
   }
 }
