@@ -1,5 +1,6 @@
-package com.kakao.tradulemaker.oauth.dto.res;
+package com.kakao.tradulemaker.oauth.dto.res.base;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakao.tradulemaker.common.Exception.ServiceDefinedException;
@@ -9,9 +10,10 @@ import lombok.Getter;
 @Getter
 public class TokenDto {
 
-  private String accessToken;
+  private final String accessToken;
 
-  private String refreshToken;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final String refreshToken;
 
   // map String token json into dto format
   public TokenDto(String responseBody) {
@@ -19,11 +21,9 @@ public class TokenDto {
 
     try {
       JsonNode jsonNode = objectMapper.readTree(responseBody);
-      String accessToken = jsonNode.get("access_token").asText();
-      String refreshToken = jsonNode.get("refresh_token").asText();
-
-      this.accessToken = accessToken;
-      this.refreshToken = refreshToken;
+      this.accessToken = jsonNode.get("access_token").asText();
+      JsonNode refT = jsonNode.get("refresh_token");
+      this.refreshToken = refT == null ? null : refT.asText();
 
     } catch (Exception exception) {
       throw new ServiceDefinedException(ErrorCode.SERVER_ERROR);
