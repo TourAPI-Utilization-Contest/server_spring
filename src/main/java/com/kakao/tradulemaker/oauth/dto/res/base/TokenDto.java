@@ -1,19 +1,19 @@
 package com.kakao.tradulemaker.oauth.dto.res;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Builder;
+import com.kakao.tradulemaker.common.Exception.ServiceDefinedException;
+import com.kakao.tradulemaker.common.Exception.config.ErrorCode;
 import lombok.Getter;
 
 @Getter
-@Builder
 public class TokenDto {
 
-  private String accessToken = null;
-  
-  private String refreshToken = null;
+  private String accessToken;
 
+  private String refreshToken;
+
+  // map String token json into dto format
   public TokenDto(String responseBody) {
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -25,8 +25,8 @@ public class TokenDto {
       this.accessToken = accessToken;
       this.refreshToken = refreshToken;
 
-    } catch (JsonProcessingException exception) {
-//      Missing statements.
+    } catch (Exception exception) {
+      throw new ServiceDefinedException(ErrorCode.SERVER_ERROR);
     }
   }
 }
