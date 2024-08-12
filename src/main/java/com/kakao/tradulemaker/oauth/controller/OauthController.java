@@ -54,7 +54,11 @@ public class OauthController {
 
   private final KakaoApi kakaoApi;
 
-  // 인가코드 받기 & 리디렉션
+  /**
+   * 인가코드 받기 & 리디렉션
+   *
+   * @return Redirection Url to api/oauth/authenticate
+   */
   @GetMapping("/connect")
   public String connectOauth() {
     String connectionUri = kakaoApi.getConnectionUri(uriForConnection, clientId, redirectUri);
@@ -62,7 +66,13 @@ public class OauthController {
     return "redirect:" + connectionUri;
   }
 
-  // 토큰 받기 (로그인/회원가입)
+  /**
+   * 토큰 받기 (로그인/회원가입)
+   * Server Only Use
+   *
+   * @param code Authentication Code from Kakao
+   * @return ResponseEntity<TokenDto>
+   */
   @GetMapping("/authenticate")
   public ResponseEntity<TokenDto> logIn(@RequestParam String code) {
     TokenDto tokenDto = kakaoApi.getTokens(uriForToken, uriForTokenInfo, code, clientId, clientSecret, redirectUri);
@@ -70,7 +80,12 @@ public class OauthController {
     return Response.ok(HttpStatus.OK, tokenDto);
   }
 
-  // 유저 정보 받기
+  /**
+   * 유저 정보 받기
+   *
+   * @param accessToken AccessToken from Kakao
+   * @return ResponseEntity<MemberDto>
+   */
   @GetMapping("/user")
   public ResponseEntity<MemberDto> userInfo(@RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken) {
     MemberDto memberDto = kakaoApi.getMember(uriForUserInfo, accessToken);
@@ -78,15 +93,25 @@ public class OauthController {
     return Response.ok(HttpStatus.OK, memberDto);
   }
 
-  // 로그아웃
+  /**
+   * 로그아웃
+   *
+   * @param accessToken AccessToken from Kakao
+   * @return ResponseEntity<?>
+   */
   @PostMapping("/logout")
   public ResponseEntity<?> logout(@RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken) {
     kakaoApi.disconnect(uriForLogout, accessToken);
-    
+
     return Response.ok(HttpStatus.OK);
   }
 
-  // 토큰갱신
+  /**
+   * 토큰갱신
+   *
+   * @param refreshToken RefreshToken from Kakao
+   * @throws ServiceDefinedException It will be caught by GlobalExceptionHandler
+   */
   @GetMapping("/refresh")
   public void refreshTokens(
           @RequestAttribute(Interceptor.REFRESH_TOKEN) String refreshToken

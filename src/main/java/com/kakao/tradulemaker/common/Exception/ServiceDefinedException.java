@@ -16,6 +16,11 @@ public class ServiceDefinedException extends RuntimeException {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private final TokenDto tokenDto;
 
+  /**
+   * 기본 에러양식
+   *
+   * @param e ErrorCode
+   */
   public ServiceDefinedException(
           ErrorCode e
   ) {
@@ -25,6 +30,12 @@ public class ServiceDefinedException extends RuntimeException {
     this.tokenDto = null;
   }
 
+  /**
+   * 토큰정보를 담은 에러양식
+   *
+   * @param e        ErrorCode
+   * @param tokenDto 리프레쉬 된 토큰 (AccessToken, RefreshToken[Optional])
+   */
   public ServiceDefinedException(
           ErrorCode e,
           TokenDto tokenDto

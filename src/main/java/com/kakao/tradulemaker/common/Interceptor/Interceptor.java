@@ -1,5 +1,6 @@
 package com.kakao.tradulemaker.common.Interceptor;
 
+import com.kakao.tradulemaker.common.Exception.ServiceDefinedException;
 import com.kakao.tradulemaker.oauth.service.KakaoApi;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,7 +40,7 @@ public class Interceptor implements HandlerInterceptor {
 
     String accessToken = request.getHeader("access_token");
     String refreshToken = request.getHeader("refresh_token");
-    
+
     request.setAttribute(ACCESS_TOKEN, accessToken);
     request.setAttribute(REFRESH_TOKEN, refreshToken);
 
@@ -51,7 +52,7 @@ public class Interceptor implements HandlerInterceptor {
       request.setAttribute(USER_ID, userID);
       return true;
 
-    } catch (Exception e) {
+    } catch (ServiceDefinedException e) {
       response.sendRedirect("/api/oauth/refresh");
       return false;
     }

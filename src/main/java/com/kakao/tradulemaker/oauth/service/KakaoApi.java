@@ -9,7 +9,6 @@ import com.kakao.tradulemaker.member.entity.Member;
 import com.kakao.tradulemaker.member.repository.MemberRepository;
 import com.kakao.tradulemaker.oauth.dto.res.base.TokenDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,12 +28,16 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class KakaoApi {
 
-  @Value("${kakao.base-uri.token-update}")
-  String uriForRefreshingToken;
-
   private final MemberRepository memberRepository;
 
-  // 카카오 로그인 페이지 리다이렉션 URI
+  /**
+   * 카카오 로그인 페이지 리다이렉션 URI 조합
+   *
+   * @param baseUri     Uri for request
+   * @param clientId    Client Id from Kakao
+   * @param redirectUri Uri for redirection
+   * @return redirection uri for logging in
+   */
   public String getConnectionUri(
           String baseUri,
           String clientId,
@@ -47,7 +50,17 @@ public class KakaoApi {
             "&response_type=code";
   }
 
-  // 사용자 로그인/회원가입 처리 후 토큰정보 발급
+  /**
+   * 사용자 로그인/회원가입 처리
+   *
+   * @param uriForToken     Uri for request
+   * @param uriForTokenInfo Uri for request
+   * @param code            Authentication code
+   * @param clientId        Client Id from Kakao
+   * @param clientSecret    Client Secret Key from Kakao
+   * @param redirectUri     Uri for redirection
+   * @return TokenDto
+   */
   public TokenDto getTokens(
           String uriForToken,
           String uriForTokenInfo,
@@ -79,7 +92,13 @@ public class KakaoApi {
     return tokenDto;
   }
 
-  // 유저정보 단일 조회
+  /**
+   * 유저정보 단일 조회
+   *
+   * @param baseUri     Uri for request
+   * @param accessToken AccessToken from Kakao
+   * @return
+   */
   public MemberDto getMember(
           String baseUri,
           String accessToken
@@ -89,7 +108,12 @@ public class KakaoApi {
     return new MemberDto(responseBody);
   }
 
-  // 로그아웃
+  /**
+   * 로그아웃
+   *
+   * @param baseUri
+   * @param accessToken
+   */
   public void disconnect(
           String baseUri,
           String accessToken
@@ -101,7 +125,15 @@ public class KakaoApi {
     fetchPost(baseUri, entity);
   }
 
-  // 토큰 갱신
+  /**
+   * 토큰 갱신 (Only used in the /api/oauth/refresh)
+   *
+   * @param baseUri      Uri for request
+   * @param refreshToken RefreshToken from Kakao
+   * @param clientId     Client Id from Kakao
+   * @param clientSecret Client Secret Key from Kakao
+   * @return TokenDto
+   */
   public TokenDto refreshTokens(
           String baseUri,
           String refreshToken,
@@ -118,12 +150,30 @@ public class KakaoApi {
     body.add("refresh_token", refreshToken);
 
     HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
-    String responseBody = fetchPost(baseUri, entity);
+
+    String responseBody = null;
+    try {
+      responseBody = new RestTemplate().exchange(
+              baseUri,
+              HttpMethod.POST,
+              entity,
+              String.class
+      ).getBody();
+    } catch (HttpClientErrorException e) {
+      // Force logging out
+      throw new ServiceDefinedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+    }
 
     return new TokenDto(responseBody);
   }
 
-  // 토큰 정보 확인 (인가)
+  /**
+   * 토큰 정보 확인 (인가)
+   *
+   * @param uriForTokenInfo Uri for request
+   * @param accessToken     AccessToken from Kakao
+   * @return userId
+   */
   public Long getUserId(
           String uriForTokenInfo,
           String accessToken
@@ -142,7 +192,13 @@ public class KakaoApi {
     return userId;
   }
 
-  // GET request
+  /**
+   * GET request
+   *
+   * @param baseUri     Uri for request
+   * @param accessToken AccessToken from Kakao
+   * @return JsonResponse
+   */
   private StringBuilder fetchGet(
           String baseUri,
           String accessToken
@@ -172,7 +228,13 @@ public class KakaoApi {
     }
   }
 
-  // POST request
+  /**
+   * POST request
+   *
+   * @param baseUri Uri for request
+   * @param entity  Body for request
+   * @return JsonResponse
+   */
   private String fetchPost(
           String baseUri,
           HttpEntity<MultiValueMap<String, String>> entity
