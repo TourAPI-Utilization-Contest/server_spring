@@ -35,9 +35,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-### Properties ###
-src/main/resources/application.yml
-
-### Docker ###
-Dockerfile
