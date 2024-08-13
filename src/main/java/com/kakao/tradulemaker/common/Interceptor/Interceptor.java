@@ -37,10 +37,8 @@ public class Interceptor implements HandlerInterceptor {
           HttpServletResponse response,
           Object handler
   ) throws IOException {
-
     String accessToken = request.getHeader("access_token");
     String refreshToken = request.getHeader("refresh_token");
-
     request.setAttribute(ACCESS_TOKEN, accessToken);
     request.setAttribute(REFRESH_TOKEN, refreshToken);
 
@@ -51,7 +49,6 @@ public class Interceptor implements HandlerInterceptor {
       Long userID = kakaoApi.getUserId(uriForTokenInfo, accessToken);
       request.setAttribute(USER_ID, userID);
       return true;
-
     } catch (ServiceDefinedException e) {
       response.sendRedirect("/api/oauth/refresh");
       return false;

@@ -38,3 +38,6 @@ out/
 
 ### Properties ###
 src/main/resources/application.yml
+
+### Docker ###
+Dockerfile
