@@ -59,7 +59,7 @@ public class OauthController {
    *
    * @return Redirection Url to api/oauth/authenticate
    */
-  @GetMapping("/connect")
+  @GetMapping("/login")
   public String connectOauth() {
     String connectionUri = kakaoApi.getConnectionUri(uriForConnection, clientId, redirectUri);
 
@@ -81,6 +81,19 @@ public class OauthController {
   }
 
   /**
+   * 로그아웃
+   *
+   * @param accessToken AccessToken from Kakao
+   * @return ResponseEntity<?>
+   */
+  @PostMapping("/logout")
+  public ResponseEntity<?> logout(@RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken) {
+    kakaoApi.disconnect(uriForLogout, accessToken);
+
+    return Response.ok(HttpStatus.OK);
+  }
+
+  /**
    * 유저 정보 받기
    *
    * @param accessToken AccessToken from Kakao
@@ -93,18 +106,6 @@ public class OauthController {
     return Response.ok(HttpStatus.OK, memberDto);
   }
 
-  /**
-   * 로그아웃
-   *
-   * @param accessToken AccessToken from Kakao
-   * @return ResponseEntity<?>
-   */
-  @PostMapping("/logout")
-  public ResponseEntity<?> logout(@RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken) {
-    kakaoApi.disconnect(uriForLogout, accessToken);
-
-    return Response.ok(HttpStatus.OK);
-  }
 
   /**
    * 토큰갱신
