@@ -13,6 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -38,6 +39,7 @@ public class KakaoApi {
    * @param redirectUri Uri for redirection
    * @return redirection uri for logging in
    */
+  @Transactional(readOnly = true)
   public String getConnectionUri(
           String baseUri,
           String clientId,
@@ -61,6 +63,7 @@ public class KakaoApi {
    * @param redirectUri     Uri for redirection
    * @return TokenDto
    */
+  @Transactional(readOnly = false)
   public TokenDto getTokens(
           String uriForToken,
           String uriForTokenInfo,
@@ -85,9 +88,14 @@ public class KakaoApi {
     TokenDto tokenDto = new TokenDto(responseBody);
 
     // Check if this user has already been registered on this service.
-    Long userId = getUserId(uriForTokenInfo, tokenDto.getAccessToken());
+    Long userId = getMemberId(uriForTokenInfo, tokenDto.getAccessToken());
     if (!memberRepository.existsById(userId))
-      memberRepository.save(new Member(userId));
+      memberRepository.save(
+              Member
+              .builder()
+              .id(userId)
+              .build()
+      );
 
     return tokenDto;
   }
@@ -99,6 +107,7 @@ public class KakaoApi {
    * @param accessToken AccessToken from Kakao
    * @return
    */
+  @Transactional(readOnly = true)
   public MemberDto getMember(
           String baseUri,
           String accessToken
@@ -114,6 +123,7 @@ public class KakaoApi {
    * @param baseUri
    * @param accessToken
    */
+  @Transactional(readOnly = true)
   public void disconnect(
           String baseUri,
           String accessToken
@@ -134,6 +144,7 @@ public class KakaoApi {
    * @param clientSecret Client Secret Key from Kakao
    * @return TokenDto
    */
+  @Transactional(readOnly = true)
   public TokenDto refreshTokens(
           String baseUri,
           String refreshToken,
@@ -174,7 +185,8 @@ public class KakaoApi {
    * @param accessToken     AccessToken from Kakao
    * @return userId
    */
-  public Long getUserId(
+  @Transactional(readOnly = true)
+  public Long getMemberId(
           String uriForTokenInfo,
           String accessToken
   ) {
@@ -199,7 +211,7 @@ public class KakaoApi {
    * @param accessToken AccessToken from Kakao
    * @return JsonResponse
    */
-  private StringBuilder fetchGet(
+  public StringBuilder fetchGet(
           String baseUri,
           String accessToken
   ) {
