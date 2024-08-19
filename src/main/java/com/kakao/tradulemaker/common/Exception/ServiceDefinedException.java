@@ -2,7 +2,7 @@ package com.kakao.tradulemaker.common.Exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kakao.tradulemaker.common.Exception.config.ErrorCode;
-import com.kakao.tradulemaker.oauth.dto.res.base.TokenDto;
+import com.kakao.tradulemaker.oauth.dto.res.base.TokenBase;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -14,7 +14,7 @@ public class ServiceDefinedException extends RuntimeException {
   private final int code;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private final TokenDto tokenDto;
+  private final TokenBase tokenDto;
 
   /**
    * 기본 에러양식
@@ -38,7 +38,7 @@ public class ServiceDefinedException extends RuntimeException {
    */
   public ServiceDefinedException(
           ErrorCode e,
-          TokenDto tokenDto
+          TokenBase tokenDto
   ) {
     super(e.getMessage());
     this.httpStatus = e.getHttpStatus();

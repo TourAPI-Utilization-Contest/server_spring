@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.time.LocalDate;
 
 @Getter
-public class ScheduleDto {
+public class ScheduleBase {
 
   private final Long id;
 
@@ -16,7 +16,7 @@ public class ScheduleDto {
 
   private final LocalDate createdAt;
 
-  public ScheduleDto(Schedule schedule) {
+  public ScheduleBase(Schedule schedule) {
     this.id = schedule.getId();
     this.title = schedule.getTitle();
     this.startsAt = schedule.getStartsAt();
