@@ -25,7 +25,7 @@ public class Interceptor implements HandlerInterceptor {
 
   public static final String REFRESH_TOKEN = "refreshToken";
 
-  public static final String USER_ID = "userId";
+  public static final String MEMBER_ID = "memberId";
 
   public Interceptor(KakaoApi kakaoApi) {
     this.kakaoApi = kakaoApi;
@@ -48,8 +48,8 @@ public class Interceptor implements HandlerInterceptor {
       return true;
 
     try {
-      Long userID = kakaoApi.getUserId(uriForTokenInfo, accessToken);
-      request.setAttribute(USER_ID, userID);
+      Long memberId = kakaoApi.getMemberId(uriForTokenInfo, accessToken);
+      request.setAttribute(MEMBER_ID, memberId);
       return true;
 
     } catch (ServiceDefinedException e) {
