@@ -20,6 +20,6 @@ public class Member {
   @Id
   private Long id;
 
-  @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.PERSIST)
+  @OneToMany(mappedBy = "member", orphanRemoval = true, cascade = CascadeType.PERSIST)
   private List<Schedule> schedules = new ArrayList<>();
 }

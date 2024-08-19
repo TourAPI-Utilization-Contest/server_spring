@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakao.tradulemaker.common.Exception.ServiceDefinedException;
 import com.kakao.tradulemaker.common.Exception.config.ErrorCode;
+import com.kakao.tradulemaker.oauth.service.KakaoApi;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
