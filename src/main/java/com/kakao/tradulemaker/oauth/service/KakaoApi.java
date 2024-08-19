@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakao.tradulemaker.common.Exception.ServiceDefinedException;
 import com.kakao.tradulemaker.common.Exception.config.ErrorCode;
-import com.kakao.tradulemaker.member.dto.res.base.MemberDto;
+import com.kakao.tradulemaker.member.dto.res.base.MemberBase;
 import com.kakao.tradulemaker.member.entity.Member;
 import com.kakao.tradulemaker.member.repository.MemberRepository;
-import com.kakao.tradulemaker.oauth.dto.res.base.TokenDto;
+import com.kakao.tradulemaker.oauth.dto.res.base.TokenBase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -64,7 +64,7 @@ public class KakaoApi {
    * @return TokenDto
    */
   @Transactional(readOnly = false)
-  public TokenDto getTokens(
+  public TokenBase getTokens(
           String uriForToken,
           String uriForTokenInfo,
           String code,
@@ -85,7 +85,7 @@ public class KakaoApi {
     HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
     String responseBody = fetchPost(uriForToken, entity);
-    TokenDto tokenDto = new TokenDto(responseBody);
+    TokenBase tokenDto = new TokenBase(responseBody);
 
     // Check if this user has already been registered on this service.
     Long userId = getMemberId(uriForTokenInfo, tokenDto.getAccessToken());
@@ -108,13 +108,13 @@ public class KakaoApi {
    * @return
    */
   @Transactional(readOnly = true)
-  public MemberDto getMember(
+  public MemberBase getMember(
           String baseUri,
           String accessToken
   ) {
     String responseBody = String.valueOf(fetchGet(baseUri, accessToken));
 
-    return new MemberDto(responseBody);
+    return new MemberBase(responseBody);
   }
 
   /**
@@ -145,7 +145,7 @@ public class KakaoApi {
    * @return TokenDto
    */
   @Transactional(readOnly = true)
-  public TokenDto refreshTokens(
+  public TokenBase refreshTokens(
           String baseUri,
           String refreshToken,
           String clientId,
@@ -175,7 +175,7 @@ public class KakaoApi {
       throw new ServiceDefinedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
     }
 
-    return new TokenDto(responseBody);
+    return new TokenBase(responseBody);
   }
 
   /**
