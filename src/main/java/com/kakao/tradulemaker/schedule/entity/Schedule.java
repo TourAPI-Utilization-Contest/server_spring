@@ -1,6 +1,7 @@
 package com.kakao.tradulemaker.schedule.entity;
 
 import com.kakao.tradulemaker.member.entity.Member;
+import com.kakao.tradulemaker.schedule.dto.req.ScheduleReq;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,4 +31,10 @@ public class Schedule {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
   private Member member;
+
+  public void update(ScheduleReq scheduleReq) {
+    this.title = scheduleReq.getTitle();
+    this.startsAt = scheduleReq.getStartsAt();
+    this.createdAt = scheduleReq.getCreatedAt();
+  }
 }
