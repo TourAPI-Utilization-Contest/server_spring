@@ -3,15 +3,15 @@ package com.kakao.tradulemaker.schedule.controller;
 import com.kakao.tradulemaker.common.Exception.config.Response;
 import com.kakao.tradulemaker.common.Interceptor.Interceptor;
 import com.kakao.tradulemaker.member.dto.res.MemberRes;
-import com.kakao.tradulemaker.member.dto.res.base.MemberDto;
+import com.kakao.tradulemaker.member.dto.res.base.MemberBase;
 import com.kakao.tradulemaker.member.entity.Member;
 import com.kakao.tradulemaker.member.service.MemberService;
 import com.kakao.tradulemaker.oauth.service.KakaoApi;
+import com.kakao.tradulemaker.schedule.dto.req.ScheduleReq;
 import com.kakao.tradulemaker.schedule.dto.res.ScheduleRes;
-import com.kakao.tradulemaker.schedule.dto.res.base.ScheduleDto;
+import com.kakao.tradulemaker.schedule.dto.res.base.ScheduleBase;
 import com.kakao.tradulemaker.schedule.entity.Schedule;
 import com.kakao.tradulemaker.schedule.service.ScheduleService;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -45,7 +44,7 @@ public class ScheduleController {
   ) {
     Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
 
-    MemberDto member = null;
+    MemberBase member = null;
     if (containsUser)
       member = kakaoApi.getMember(uriForUserInfo, accessToken);
 
@@ -63,9 +62,9 @@ public class ScheduleController {
           @RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken
   ) {
     Member member = memberService.readMemberById(memberId);
-    List<ScheduleDto> scheduleDtoList = member.getSchedules()
+    List<ScheduleBase> scheduleDtoList = member.getSchedules()
             .stream()
-            .map(ScheduleDto::new)
+            .map(ScheduleBase::new)
             .toList();
 
     String responseBody = kakaoApi.fetchGet(uriForUserInfo, accessToken).toString();
@@ -79,24 +78,38 @@ public class ScheduleController {
   }
 
   @PostMapping
-  public ResponseEntity<?> create(
-          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
-  ) {
+  public ResponseEntity<Long> create(
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
+          @RequestBody ScheduleReq scheduleReq
+          ) {
+    Member member = memberService.readMemberById(memberId);
 
-    return Response.ok(HttpStatus.CREATED);
+    Long scheduleId = scheduleService.create(scheduleReq, member);
+
+    return Response.ok(HttpStatus.CREATED, scheduleId);
   }
 
-  @PutMapping
-  public ResponseEntity<?> update(
-          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
+  @PutMapping("/{scheduleId}")
+  public ResponseEntity<Long> update(
+          @PathVariable("scheduleId") Long scheduleId,
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
+          @RequestBody ScheduleReq scheduleReq
   ) {
+    Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
+    Long id = scheduleService.update(schedule, scheduleReq);
 
-    return Response.ok(HttpStatus.OK);
+    return Response.ok(HttpStatus.OK, id);
   }
 
-  @DeleteMapping
-  public ResponseEntity<?> delete() {
+  @DeleteMapping("/{scheduleId}")
+  public ResponseEntity<?> delete(
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
+          @PathVariable("scheduleId") Long scheduleId
+  ) {
+    Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
+    Long id = scheduleService.delete(schedule);
 
-    return Response.ok(HttpStatus.OK);
+
+    return Response.ok(HttpStatus.OK, id);
   }
 }
