@@ -13,6 +13,13 @@ public class MemberService {
 
   private final MemberRepository memberRepository;
 
+  /**
+   * 회원 조회
+   *
+   * @param memberId memberId from Kakao
+   * @return Member
+   * @throws ServiceDefinedException when members cannot be found
+   */
   public Member readMemberById(Long memberId) {
     return memberRepository.findById(memberId)
             .orElseThrow(() -> new ServiceDefinedException(ErrorCode.NOT_FOUND));

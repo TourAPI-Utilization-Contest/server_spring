@@ -32,6 +32,11 @@ public class Schedule {
   @JoinColumn(name = "member_id")
   private Member member;
 
+  /**
+   * 스케쥴 업데이트
+   *
+   * @param scheduleReq scheduleReq
+   */
   public void update(ScheduleReq scheduleReq) {
     this.title = scheduleReq.getTitle();
     this.startsAt = scheduleReq.getStartsAt();

@@ -35,6 +35,15 @@ public class ScheduleController {
 
   private final MemberService memberService;
 
+  /**
+   * 특정 스케줄 조회
+   *
+   * @param scheduleId scheduleId
+   * @param memberId memberId from Kakao
+   * @param accessToken AccessToken from Kakao
+   * @param containsUser Whether the schedule includes user
+   * @return ResponseEntity<ScheduleRes>
+   */
   @GetMapping("/{scheduleId}")
   public ResponseEntity<ScheduleRes> findOne(
           @PathVariable("scheduleId") Long scheduleId,
@@ -56,6 +65,13 @@ public class ScheduleController {
     return Response.ok(HttpStatus.OK, scheduleRes);
   }
 
+  /**
+   * 사용자의 모든 스케줄 조회
+   *
+   * @param memberId memberId from kakao
+   * @param accessToken AccessToken from Kakao
+   * @return ResponseEntity<MemberRes>
+   */
   @GetMapping
   public ResponseEntity<MemberRes> findAll(
           @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
@@ -77,6 +93,13 @@ public class ScheduleController {
     return Response.ok(HttpStatus.OK, memberRes);
   }
 
+  /**
+   * 새로운 스케줄 생성
+   *
+   * @param memberId memberId
+   * @param scheduleReq scheduleReq
+   * @return ResponseEntity<Long>
+   */
   @PostMapping
   public ResponseEntity<Long> create(
           @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
@@ -89,6 +112,14 @@ public class ScheduleController {
     return Response.ok(HttpStatus.CREATED, scheduleId);
   }
 
+  /**
+   * 스케줄 업데이트
+   *
+   * @param scheduleId scheduleId
+   * @param memberId memberId from Kakao
+   * @param scheduleReq scheduleReq
+   * @return ResponseEntity<Long>
+   */
   @PutMapping("/{scheduleId}")
   public ResponseEntity<Long> update(
           @PathVariable("scheduleId") Long scheduleId,
@@ -101,6 +132,13 @@ public class ScheduleController {
     return Response.ok(HttpStatus.OK, id);
   }
 
+  /**
+   * 스케줄 삭제
+   *
+   * @param memberId memberId from Kakao
+   * @param scheduleId scheduleId
+   * @return ResponseEntity<?>
+   */
   @DeleteMapping("/{scheduleId}")
   public ResponseEntity<?> delete(
           @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,

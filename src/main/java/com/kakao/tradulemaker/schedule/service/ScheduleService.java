@@ -19,6 +19,14 @@ public class ScheduleService {
 
   private final ScheduleRepository scheduleRepository;
 
+  /**
+   * 일정 조회
+   *
+   * @param scheduleId scheduleId
+   * @param memberId meemberId from Kakao
+   * @return Schedule
+   * @throws ServiceDefinedException when the requested schedule is not accessible
+   */
   @Transactional(readOnly = true)
   public Schedule readSchedule(
           Long scheduleId,
@@ -30,6 +38,13 @@ public class ScheduleService {
             .orElseThrow(() -> new ServiceDefinedException(ErrorCode.FORBIDDEN_TO_ACCESS));
   }
 
+  /**
+   * 일정 생성
+   *
+   * @param scheduleReq scheduleReq
+   * @param member member
+   * @return Long
+   */
   @Transactional(readOnly = false)
   public Long create(
           ScheduleReq scheduleReq,
@@ -45,6 +60,13 @@ public class ScheduleService {
     return scheduleRepository.save(schedule).getId();
   }
 
+  /**
+   * 일정 수정
+   *
+   * @param schedule schedule
+   * @param scheduleReq scheduleReq
+   * @return Long
+   */
   @Transactional(readOnly = false)
   public Long update(
           Schedule schedule,
@@ -55,6 +77,12 @@ public class ScheduleService {
     return schedule.getId();
   }
 
+  /**
+   * 일정 삭제
+   *
+   * @param schedule schedule
+   * @return Long
+   */
   @Transactional(readOnly = false)
   public Long delete(Schedule schedule) {
     scheduleRepository.delete(schedule);
