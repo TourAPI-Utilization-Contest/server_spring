@@ -47,9 +47,9 @@ public class ScheduleController {
   @GetMapping("/{scheduleId}")
   public ResponseEntity<ScheduleRes> findOne(
           @PathVariable("scheduleId") Long scheduleId,
+          @RequestParam(required = true, value = "contains-user") Boolean containsUser,
           @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
-          @RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken,
-          @RequestParam(required = true, value = "contains-user") Boolean containsUser
+          @RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken
   ) {
     Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
 
@@ -102,8 +102,8 @@ public class ScheduleController {
    */
   @PostMapping
   public ResponseEntity<Long> create(
-          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
-          @RequestBody ScheduleReq scheduleReq
+          @RequestBody ScheduleReq scheduleReq,
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
           ) {
     Member member = memberService.readMemberById(memberId);
 
@@ -122,9 +122,9 @@ public class ScheduleController {
    */
   @PutMapping("/{scheduleId}")
   public ResponseEntity<Long> update(
+          @RequestBody ScheduleReq scheduleReq,
           @PathVariable("scheduleId") Long scheduleId,
-          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
-          @RequestBody ScheduleReq scheduleReq
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
   ) {
     Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
     Long id = scheduleService.update(schedule, scheduleReq);
@@ -141,8 +141,8 @@ public class ScheduleController {
    */
   @DeleteMapping("/{scheduleId}")
   public ResponseEntity<?> delete(
-          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
-          @PathVariable("scheduleId") Long scheduleId
+          @PathVariable("scheduleId") Long scheduleId,
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
   ) {
     Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
     Long id = scheduleService.delete(schedule);

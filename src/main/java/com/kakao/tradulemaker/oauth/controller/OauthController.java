@@ -114,9 +114,8 @@ public class OauthController {
    * @throws ServiceDefinedException It will be caught by GlobalExceptionHandler
    */
   @GetMapping("/refresh")
-  public void refreshTokens(
-          @RequestAttribute(Interceptor.REFRESH_TOKEN) String refreshToken
-  ) throws ServiceDefinedException {
+  public void refreshTokens(@RequestAttribute(Interceptor.REFRESH_TOKEN) String refreshToken)
+          throws ServiceDefinedException {
     TokenBase refreshedTokenDto = kakaoApi.refreshTokens(uriForTokenUpdate, refreshToken, clientId, clientSecret);
 
     throw new ServiceDefinedException(ErrorCode.SUCCESS_REFRESH, refreshedTokenDto);
