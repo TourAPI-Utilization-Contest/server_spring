@@ -4,8 +4,8 @@ import com.kakao.tradulemaker.common.Exception.ServiceDefinedException;
 import com.kakao.tradulemaker.common.Exception.config.ErrorCode;
 import com.kakao.tradulemaker.common.Exception.config.Response;
 import com.kakao.tradulemaker.common.Interceptor.Interceptor;
-import com.kakao.tradulemaker.member.dto.res.base.MemberDto;
-import com.kakao.tradulemaker.oauth.dto.res.base.TokenDto;
+import com.kakao.tradulemaker.member.dto.res.base.MemberBase;
+import com.kakao.tradulemaker.oauth.dto.res.base.TokenBase;
 import com.kakao.tradulemaker.oauth.service.KakaoApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,8 +74,8 @@ public class OauthController {
    * @return ResponseEntity<TokenDto>
    */
   @GetMapping("/authenticate")
-  public ResponseEntity<TokenDto> logIn(@RequestParam String code) {
-    TokenDto tokenDto = kakaoApi.getTokens(uriForToken, uriForTokenInfo, code, clientId, clientSecret, redirectUri);
+  public ResponseEntity<TokenBase> logIn(@RequestParam String code) {
+    TokenBase tokenDto = kakaoApi.getTokens(uriForToken, uriForTokenInfo, code, clientId, clientSecret, redirectUri);
 
     return Response.ok(HttpStatus.OK, tokenDto);
   }
@@ -100,8 +100,8 @@ public class OauthController {
    * @return ResponseEntity<MemberDto>
    */
   @GetMapping("/user")
-  public ResponseEntity<MemberDto> userInfo(@RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken) {
-    MemberDto memberDto = kakaoApi.getMember(uriForUserInfo, accessToken);
+  public ResponseEntity<MemberBase> userInfo(@RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken) {
+    MemberBase memberDto = kakaoApi.getMember(uriForUserInfo, accessToken);
 
     return Response.ok(HttpStatus.OK, memberDto);
   }
@@ -114,10 +114,9 @@ public class OauthController {
    * @throws ServiceDefinedException It will be caught by GlobalExceptionHandler
    */
   @GetMapping("/refresh")
-  public void refreshTokens(
-          @RequestAttribute(Interceptor.REFRESH_TOKEN) String refreshToken
-  ) throws ServiceDefinedException {
-    TokenDto refreshedTokenDto = kakaoApi.refreshTokens(uriForTokenUpdate, refreshToken, clientId, clientSecret);
+  public void refreshTokens(@RequestAttribute(Interceptor.REFRESH_TOKEN) String refreshToken)
+          throws ServiceDefinedException {
+    TokenBase refreshedTokenDto = kakaoApi.refreshTokens(uriForTokenUpdate, refreshToken, clientId, clientSecret);
 
     throw new ServiceDefinedException(ErrorCode.SUCCESS_REFRESH, refreshedTokenDto);
   }

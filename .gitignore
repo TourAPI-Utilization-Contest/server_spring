@@ -38,6 +38,7 @@ out/
 
 ### Properties ###
 src/main/resources/application.yml
+src/main/resources/import.sql
 
 ### Docker ###
 Dockerfile

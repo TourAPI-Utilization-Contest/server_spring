@@ -11,7 +11,9 @@ public enum ErrorCode {
   INVALID_ACCESS_TOKEN(-401, HttpStatus.BAD_REQUEST, "Invalid Access token."),
   // 403-FORBIDDEN [-411, -420]
   EXPIRED_REFRESH_TOKEN(-411, HttpStatus.FORBIDDEN, "Refresh token has been expired."),
+  FORBIDDEN_TO_ACCESS(-412, HttpStatus.FORBIDDEN, "you don't have right to access."),
   // 404-NOT_FOUND [-421, -430]
+  NOT_FOUND(-421, HttpStatus.NOT_FOUND, "The content you tried to find is not found."),
   // 500-INTERNAL_SERVER_ERROR
   SERVER_ERROR(-500, HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong."),
   // SUCCESS_REFRESH

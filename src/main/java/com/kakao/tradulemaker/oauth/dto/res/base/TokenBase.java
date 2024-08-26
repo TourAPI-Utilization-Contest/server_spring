@@ -8,7 +8,7 @@ import com.kakao.tradulemaker.common.Exception.config.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class TokenDto {
+public class TokenBase {
 
   private final String accessToken;
 
@@ -16,7 +16,7 @@ public class TokenDto {
   private final String refreshToken;
 
   // map String token json into dto format
-  public TokenDto(String responseBody) {
+  public TokenBase(String responseBody) {
     ObjectMapper objectMapper = new ObjectMapper();
 
     try {

@@ -4,15 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakao.tradulemaker.common.Exception.ServiceDefinedException;
 import com.kakao.tradulemaker.common.Exception.config.ErrorCode;
-import com.kakao.tradulemaker.member.dto.res.base.MemberDto;
+import com.kakao.tradulemaker.member.dto.res.base.MemberBase;
 import com.kakao.tradulemaker.member.entity.Member;
 import com.kakao.tradulemaker.member.repository.MemberRepository;
-import com.kakao.tradulemaker.oauth.dto.res.base.TokenDto;
+import com.kakao.tradulemaker.oauth.dto.res.base.TokenBase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -38,6 +39,7 @@ public class KakaoApi {
    * @param redirectUri Uri for redirection
    * @return redirection uri for logging in
    */
+  @Transactional(readOnly = true)
   public String getConnectionUri(
           String baseUri,
           String clientId,
@@ -61,7 +63,8 @@ public class KakaoApi {
    * @param redirectUri     Uri for redirection
    * @return TokenDto
    */
-  public TokenDto getTokens(
+  @Transactional(readOnly = false)
+  public TokenBase getTokens(
           String uriForToken,
           String uriForTokenInfo,
           String code,
@@ -82,12 +85,17 @@ public class KakaoApi {
     HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
     String responseBody = fetchPost(uriForToken, entity);
-    TokenDto tokenDto = new TokenDto(responseBody);
+    TokenBase tokenDto = new TokenBase(responseBody);
 
     // Check if this user has already been registered on this service.
-    Long userId = getUserId(uriForTokenInfo, tokenDto.getAccessToken());
+    Long userId = getMemberId(uriForTokenInfo, tokenDto.getAccessToken());
     if (!memberRepository.existsById(userId))
-      memberRepository.save(new Member(userId));
+      memberRepository.save(
+              Member
+              .builder()
+              .id(userId)
+              .build()
+      );
 
     return tokenDto;
   }
@@ -99,13 +107,14 @@ public class KakaoApi {
    * @param accessToken AccessToken from Kakao
    * @return
    */
-  public MemberDto getMember(
+  @Transactional(readOnly = true)
+  public MemberBase getMember(
           String baseUri,
           String accessToken
   ) {
     String responseBody = String.valueOf(fetchGet(baseUri, accessToken));
 
-    return new MemberDto(responseBody);
+    return new MemberBase(responseBody);
   }
 
   /**
@@ -114,6 +123,7 @@ public class KakaoApi {
    * @param baseUri
    * @param accessToken
    */
+  @Transactional(readOnly = true)
   public void disconnect(
           String baseUri,
           String accessToken
@@ -134,7 +144,8 @@ public class KakaoApi {
    * @param clientSecret Client Secret Key from Kakao
    * @return TokenDto
    */
-  public TokenDto refreshTokens(
+  @Transactional(readOnly = true)
+  public TokenBase refreshTokens(
           String baseUri,
           String refreshToken,
           String clientId,
@@ -164,7 +175,7 @@ public class KakaoApi {
       throw new ServiceDefinedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
     }
 
-    return new TokenDto(responseBody);
+    return new TokenBase(responseBody);
   }
 
   /**
@@ -174,7 +185,8 @@ public class KakaoApi {
    * @param accessToken     AccessToken from Kakao
    * @return userId
    */
-  public Long getUserId(
+  @Transactional(readOnly = true)
+  public Long getMemberId(
           String uriForTokenInfo,
           String accessToken
   ) {
@@ -199,7 +211,7 @@ public class KakaoApi {
    * @param accessToken AccessToken from Kakao
    * @return JsonResponse
    */
-  private StringBuilder fetchGet(
+  public StringBuilder fetchGet(
           String baseUri,
           String accessToken
   ) {
