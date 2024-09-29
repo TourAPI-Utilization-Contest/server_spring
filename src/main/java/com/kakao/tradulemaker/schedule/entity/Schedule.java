@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -25,12 +27,24 @@ public class Schedule {
   @Column(name = "starts_at")
   private LocalDate startsAt;
 
-  @Column(name = "created_at")
-  private LocalDate createdAt;
+  @Column(name = "ends_at")
+  private LocalDate endsAt;
+
+  @Column(name = "updated_at")
+  private LocalDate updatedAt;
+
+  @Column(name = "icon")
+  private String icon;
+
+  @Column(name = "color")
+  private Long color;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
   private Member member;
+
+  @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
+  private List<ScheduleDetail> scheduleDetails = new ArrayList<>();
 
   /**
    * 스케쥴 업데이트
@@ -40,6 +54,9 @@ public class Schedule {
   public void update(ScheduleReq scheduleReq) {
     this.title = scheduleReq.getTitle();
     this.startsAt = scheduleReq.getStartsAt();
-    this.createdAt = scheduleReq.getCreatedAt();
+    this.endsAt = scheduleReq.getEndsAt();
+    this.updatedAt = scheduleReq.getUpdatedAt();
+    this.icon = scheduleReq.getIcon();
+    this.color = scheduleReq.getColor();
   }
 }

@@ -13,6 +13,9 @@ import java.io.IOException;
 @Component
 public class Interceptor implements HandlerInterceptor {
 
+  @Value("${server.admin-token}")
+  private String adminToken;
+
   @Value("${kakao.base-uri.token-info}")
   private String uriForTokenInfo;
 
@@ -44,6 +47,11 @@ public class Interceptor implements HandlerInterceptor {
     request.setAttribute(ACCESS_TOKEN, accessToken);
     request.setAttribute(REFRESH_TOKEN, refreshToken);
 
+    if (accessToken.equals(adminToken)) {
+      request.setAttribute(MEMBER_ID, 1L);
+      return true;
+    };
+
     if (request.getRequestURI().contains("/api/oauth/refresh"))
       return true;
 
@@ -51,10 +59,10 @@ public class Interceptor implements HandlerInterceptor {
       Long memberId = kakaoApi.getMemberId(uriForTokenInfo, accessToken);
       request.setAttribute(MEMBER_ID, memberId);
       return true;
-
     } catch (ServiceDefinedException e) {
       response.sendRedirect("/api/oauth/refresh");
       return false;
     }
+
   }
 }

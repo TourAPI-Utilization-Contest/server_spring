@@ -17,6 +17,18 @@ public class MemberBase {
 
   private final String profileUrl;
 
+  public MemberBase(
+          Long id,
+          String email,
+          String nickname,
+          String profileUrl
+  ) {
+    this.id = id;
+    this.email = email;
+    this.nickname = nickname;
+    this.profileUrl = profileUrl;
+  }
+
   public MemberBase(String responseBody) {
     ObjectMapper objectMapper = new ObjectMapper();
 

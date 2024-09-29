@@ -14,12 +14,21 @@ public class ScheduleBase {
 
   private final LocalDate startsAt;
 
-  private final LocalDate createdAt;
+  private final LocalDate endsAt;
+
+  private final LocalDate updatedAt;
+
+  private final String icon;
+
+  private final Long color;
 
   public ScheduleBase(Schedule schedule) {
     this.id = schedule.getId();
     this.title = schedule.getTitle();
     this.startsAt = schedule.getStartsAt();
-    this.createdAt = schedule.getCreatedAt();
+    this.endsAt = schedule.getEndsAt();
+    this.updatedAt = schedule.getUpdatedAt();
+    this.icon = schedule.getIcon();
+    this.color = schedule.getColor();
   }
 }

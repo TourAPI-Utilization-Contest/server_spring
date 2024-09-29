@@ -10,6 +10,7 @@ import com.kakao.tradulemaker.oauth.service.KakaoApi;
 import com.kakao.tradulemaker.schedule.dto.req.ScheduleReq;
 import com.kakao.tradulemaker.schedule.dto.res.ScheduleRes;
 import com.kakao.tradulemaker.schedule.dto.res.base.ScheduleBase;
+import com.kakao.tradulemaker.schedule.dto.res.base.ScheduleDetailBase;
 import com.kakao.tradulemaker.schedule.entity.Schedule;
 import com.kakao.tradulemaker.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/schedule")
 public class ScheduleController {
+
+  @Value("${server.admin-token}")
+  private String adminToken;
 
   @Value("${kakao.base-uri.user-info}")
   private String uriForUserInfo;
@@ -51,15 +55,30 @@ public class ScheduleController {
           @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
           @RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken
   ) {
+    System.out.println(accessToken.equals(adminToken));
+
     Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
+    List<ScheduleDetailBase> details = schedule.getScheduleDetails()
+            .stream()
+            .map(ScheduleDetailBase::new)
+            .toList();
 
     MemberBase member = null;
-    if (containsUser)
-      member = kakaoApi.getMember(uriForUserInfo, accessToken);
+    if (containsUser) {
+      // official test
+      if (accessToken.equals(adminToken)) {
+        Member admin = memberService.readMemberById(memberId);
+        member = new MemberBase(admin.getId(), admin.getEmail(), admin.getNickname(), admin.getProfileUrl());
+      }
+//      real code
+      else member = kakaoApi.getMember(uriForUserInfo, accessToken);
+    }
+
 
     ScheduleRes scheduleRes = ScheduleRes.builder()
             .schedule(schedule)
             .memberDto(member)
+            .details(details)
             .build();
 
     return Response.ok(HttpStatus.OK, scheduleRes);
@@ -83,12 +102,25 @@ public class ScheduleController {
             .map(ScheduleBase::new)
             .toList();
 
-    String responseBody = kakaoApi.fetchGet(uriForUserInfo, accessToken).toString();
+    String responseBody = null;
+    MemberRes memberRes = null;
 
-    MemberRes memberRes = MemberRes.builder()
-            .responseBody(responseBody)
-            .scheduleDtoList(scheduleDtoList)
-            .build();
+    if (accessToken.equals(adminToken)) {
+      memberRes = new MemberRes(
+              member.getId(),
+              member.getEmail(),
+              member.getNickname(),
+              member.getProfileUrl(),
+              scheduleDtoList
+      );
+    }
+    else {
+      responseBody = kakaoApi.fetchGet(uriForUserInfo, accessToken).toString();
+      memberRes = MemberRes.builder()
+              .responseBody(responseBody)
+              .scheduleDtoList(scheduleDtoList)
+              .build();
+    }
 
     return Response.ok(HttpStatus.OK, memberRes);
   }
@@ -111,6 +143,10 @@ public class ScheduleController {
 
     return Response.ok(HttpStatus.CREATED, scheduleId);
   }
+
+
+//  @PostMapping("/{scheduleId}")
+
 
   /**
    * 스케줄 업데이트

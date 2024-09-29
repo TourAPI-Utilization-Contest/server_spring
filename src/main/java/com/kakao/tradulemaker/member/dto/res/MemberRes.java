@@ -22,4 +22,16 @@ public class MemberRes extends MemberBase {
     super(responseBody);
     this.scheduleList = scheduleDtoList;
   }
+
+//  official test
+  public MemberRes(
+          Long id,
+          String email,
+          String nickname,
+          String profileUrl,
+          List<ScheduleBase> scheduleDtoList
+  ) {
+    super(id, email, nickname, profileUrl);
+    this.scheduleList = scheduleDtoList;
+  }
 }

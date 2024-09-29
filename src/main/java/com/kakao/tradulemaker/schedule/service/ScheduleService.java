@@ -53,7 +53,10 @@ public class ScheduleService {
     Schedule schedule = Schedule.builder()
             .title(scheduleReq.getTitle())
             .startsAt(scheduleReq.getStartsAt())
-            .createdAt(scheduleReq.getCreatedAt())
+            .endsAt(scheduleReq.getEndsAt())
+            .updatedAt(scheduleReq.getUpdatedAt())
+            .icon(scheduleReq.getIcon())
+            .color(scheduleReq.getColor())
             .member(member)
             .build();
 

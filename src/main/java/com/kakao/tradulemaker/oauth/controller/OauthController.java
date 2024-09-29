@@ -5,7 +5,11 @@ import com.kakao.tradulemaker.common.Exception.config.ErrorCode;
 import com.kakao.tradulemaker.common.Exception.config.Response;
 import com.kakao.tradulemaker.common.Interceptor.Interceptor;
 import com.kakao.tradulemaker.member.dto.res.base.MemberBase;
+import com.kakao.tradulemaker.member.entity.Member;
+import com.kakao.tradulemaker.member.service.MemberService;
+import com.kakao.tradulemaker.oauth.dto.req.LoginTest;
 import com.kakao.tradulemaker.oauth.dto.res.base.TokenBase;
+import com.kakao.tradulemaker.oauth.dto.res.base.TokenTest;
 import com.kakao.tradulemaker.oauth.service.KakaoApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/oauth")
 public class OauthController {
+
+  @Value("${server.admin-token}")
+  private String adminToken;
 
   @Value("${server.host}")
   private String host;
@@ -53,6 +60,28 @@ public class OauthController {
   private String clientSecret;
 
   private final KakaoApi kakaoApi;
+
+  private final MemberService memberService;
+
+  @GetMapping("/login-test")
+  public ResponseEntity<TokenTest> loginTest(
+          @RequestBody LoginTest loginTest
+          ) {
+    Member member = memberService.readMemberById(1L);
+
+    if (!member.getEmail().equals(loginTest.getEmail()) || !loginTest.getPassword().equals("1234"))
+      throw new ServiceDefinedException(ErrorCode.NOT_FOUND);
+
+    TokenTest token = new TokenTest(member);
+
+    return Response.ok(HttpStatus.OK, token);
+  }
+
+  @GetMapping("/logout-test")
+  public ResponseEntity<?> logoutTest() {
+
+    throw new ServiceDefinedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+  }
 
   /**
    * 인가코드 받기 & 리디렉션
@@ -100,8 +129,19 @@ public class OauthController {
    * @return ResponseEntity<MemberDto>
    */
   @GetMapping("/user")
-  public ResponseEntity<MemberBase> userInfo(@RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken) {
-    MemberBase memberDto = kakaoApi.getMember(uriForUserInfo, accessToken);
+  public ResponseEntity<MemberBase> userInfo(
+          @RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken,
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
+  ) {
+
+    MemberBase memberDto = null;
+
+    if (accessToken.equals(adminToken)) {
+      Member admin = memberService.readMemberById(memberId);
+      memberDto = new MemberBase(admin.getId(), admin.getEmail(), admin.getNickname(), admin.getProfileUrl());
+    } else {
+      memberDto = kakaoApi.getMember(uriForUserInfo, accessToken);
+    }
 
     return Response.ok(HttpStatus.OK, memberDto);
   }

@@ -15,5 +15,11 @@ public class ScheduleReq {
 
   private LocalDate startsAt;
 
-  private LocalDate createdAt;
+  private LocalDate endsAt;
+
+  private LocalDate updatedAt;
+
+  private String icon;
+
+  private Long color;
 }
