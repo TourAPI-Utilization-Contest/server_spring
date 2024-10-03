@@ -7,11 +7,14 @@ import com.kakao.tradulemaker.member.dto.res.base.MemberBase;
 import com.kakao.tradulemaker.member.entity.Member;
 import com.kakao.tradulemaker.member.service.MemberService;
 import com.kakao.tradulemaker.oauth.service.KakaoApi;
+import com.kakao.tradulemaker.schedule.dto.req.ScheduleDetailReq;
 import com.kakao.tradulemaker.schedule.dto.req.ScheduleReq;
 import com.kakao.tradulemaker.schedule.dto.res.ScheduleRes;
 import com.kakao.tradulemaker.schedule.dto.res.base.ScheduleBase;
 import com.kakao.tradulemaker.schedule.dto.res.base.ScheduleDetailBase;
 import com.kakao.tradulemaker.schedule.entity.Schedule;
+import com.kakao.tradulemaker.schedule.entity.ScheduleDetail;
+import com.kakao.tradulemaker.schedule.service.ScheduleDetailService;
 import com.kakao.tradulemaker.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +42,8 @@ public class ScheduleController {
 
   private final MemberService memberService;
 
+  private final ScheduleDetailService scheduleDetailService;
+
   /**
    * 특정 스케줄 조회
    *
@@ -55,8 +60,6 @@ public class ScheduleController {
           @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
           @RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken
   ) {
-    System.out.println(accessToken.equals(adminToken));
-
     Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
     List<ScheduleDetailBase> details = schedule.getScheduleDetails()
             .stream()
@@ -144,8 +147,18 @@ public class ScheduleController {
     return Response.ok(HttpStatus.CREATED, scheduleId);
   }
 
+  @PostMapping("/{scheduleId}")
+  public ResponseEntity<Long> createDetail(
+          @RequestBody ScheduleDetailReq scheduleDetailReq,
+          @PathVariable("scheduleId") Long scheduleId,
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
+          ) {
 
-//  @PostMapping("/{scheduleId}")
+    Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
+    Long scheduleDetailId = scheduleDetailService.create(scheduleDetailReq, schedule);
+
+    return Response.ok(HttpStatus.CREATED, scheduleDetailId);
+  }
 
 
   /**
@@ -168,6 +181,20 @@ public class ScheduleController {
     return Response.ok(HttpStatus.OK, id);
   }
 
+  @PutMapping("/{scheduleId}/{scheduleDetailId}")
+  public ResponseEntity<Long> update(
+          @RequestBody ScheduleDetailReq scheduleDetailReq,
+          @PathVariable("scheduleId") Long scheduleId,
+          @PathVariable("scheduleDetailId") Long scheduleDetailId,
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
+                                     ) {
+    Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
+    ScheduleDetail scheduleDetail = scheduleDetailService.readScheduleDetail(schedule, scheduleDetailId);
+    Long id = scheduleDetailService.update(scheduleDetail, scheduleDetailReq);
+
+    return Response.ok(HttpStatus.OK, id);
+  }
+
   /**
    * 스케줄 삭제
    *
@@ -176,13 +203,24 @@ public class ScheduleController {
    * @return ResponseEntity<?>
    */
   @DeleteMapping("/{scheduleId}")
-  public ResponseEntity<?> delete(
+  public ResponseEntity<Long> delete(
           @PathVariable("scheduleId") Long scheduleId,
           @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
   ) {
     Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
     Long id = scheduleService.delete(schedule);
 
+    return Response.ok(HttpStatus.OK, id);
+  }
+
+  @DeleteMapping("/{scheduleId}/{scheduleDetailId}")
+  public ResponseEntity<Long> delete(
+          @PathVariable("scheduleId") Long scheduleId,
+          @PathVariable("scheduleDetailId") Long scheduleDetailId,
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
+  ) {
+    Schedule schedule = scheduleService.readSchedule(scheduleId, memberId);
+    Long id = scheduleDetailService.delete(schedule, scheduleDetailId);
 
     return Response.ok(HttpStatus.OK, id);
   }

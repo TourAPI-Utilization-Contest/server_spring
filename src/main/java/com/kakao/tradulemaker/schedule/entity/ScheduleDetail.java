@@ -1,5 +1,6 @@
 package com.kakao.tradulemaker.schedule.entity;
 
+import com.kakao.tradulemaker.schedule.dto.req.ScheduleDetailReq;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ public class ScheduleDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column(name = "detail")
     private String detail;
@@ -20,4 +21,8 @@ public class ScheduleDetail {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
+
+    public void update(ScheduleDetailReq scheduleDetailReq) {
+        this.detail = scheduleDetailReq.getDetail();
+    }
 }
