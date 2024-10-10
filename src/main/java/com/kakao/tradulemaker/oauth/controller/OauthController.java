@@ -11,7 +11,9 @@ import com.kakao.tradulemaker.oauth.dto.req.LoginTest;
 import com.kakao.tradulemaker.oauth.dto.res.base.TokenBase;
 import com.kakao.tradulemaker.oauth.dto.res.base.TokenTest;
 import com.kakao.tradulemaker.oauth.service.KakaoApi;
+import com.kakao.tradulemaker.oauth.service.Login;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.dialect.SybaseSqlAstTranslator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,18 +65,31 @@ public class OauthController {
 
   private final MemberService memberService;
 
-  @GetMapping("/login-test")
-  public ResponseEntity<TokenTest> loginTest(
+  private final Login login;
+
+
+  @PostMapping("/register")
+  public ResponseEntity<Member> registerMember(
+          @RequestBody LoginTest memberRegister
+          ) {
+    Member member = login.registerMember(memberRegister);
+
+    return Response.ok(HttpStatus.CREATED, member);
+  }
+
+  @PostMapping("/login-test")
+  public ResponseEntity<Long> loginTest(
           @RequestBody LoginTest loginTest
           ) {
-    Member member = memberService.readMemberById(1L);
+    Member member = login.readMemberByEmail(loginTest.getEmail());
 
-    if (!member.getEmail().equals(loginTest.getEmail()) || !loginTest.getPassword().equals("1234"))
+    if (!member.getPassword().equals(loginTest.getPassword())) {
       throw new ServiceDefinedException(ErrorCode.NOT_FOUND);
+    }
 
-    TokenTest token = new TokenTest(member);
+    Long memberId = member.getId();
 
-    return Response.ok(HttpStatus.OK, token);
+    return Response.ok(HttpStatus.OK, memberId);
   }
 
   @GetMapping("/logout-test")
@@ -133,7 +148,6 @@ public class OauthController {
           @RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken,
           @RequestAttribute(Interceptor.MEMBER_ID) Long memberId
   ) {
-
     MemberBase memberDto = null;
 
     if (accessToken.equals(adminToken)) {
@@ -160,4 +174,16 @@ public class OauthController {
 
     throw new ServiceDefinedException(ErrorCode.SUCCESS_REFRESH, refreshedTokenDto);
   }
+
+  @PutMapping("/user")
+  public ResponseEntity<Long> updateMember(
+          @RequestAttribute(Interceptor.ACCESS_TOKEN) String accessToken,
+          @RequestAttribute(Interceptor.MEMBER_ID) Long memberId,
+          @RequestBody String extra
+        ) {
+        login.updateMember(memberId, extra);
+
+        return Response.ok(HttpStatus.OK, memberId);
+    }
+
 }
