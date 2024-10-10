@@ -4,6 +4,7 @@ import com.kakao.tradulemaker.schedule.entity.Schedule;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 public class ScheduleBase {
@@ -16,7 +17,7 @@ public class ScheduleBase {
 
   private final LocalDate endsAt;
 
-  private final LocalDate updatedAt;
+  private final LocalDateTime updatedAt;
 
   private final String icon;
 

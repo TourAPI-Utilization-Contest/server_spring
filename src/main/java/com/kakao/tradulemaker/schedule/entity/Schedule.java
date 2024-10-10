@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class Schedule {
   private LocalDate endsAt;
 
   @Column(name = "updated_at")
-  private LocalDate updatedAt;
+  private LocalDateTime updatedAt;
 
   @Column(name = "icon")
   private String icon;

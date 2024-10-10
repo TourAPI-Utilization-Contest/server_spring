@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -17,7 +18,7 @@ public class ScheduleReq {
 
   private LocalDate endsAt;
 
-  private LocalDate updatedAt;
+  private LocalDateTime updatedAt;
 
   private String icon;
 
