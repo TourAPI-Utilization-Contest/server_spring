@@ -37,6 +37,7 @@ public class ScheduleDetailService {
                .orElseThrow(() -> new ServiceDefinedException(ErrorCode.NOT_FOUND));
     }
 
+    @Transactional(readOnly = false)
     public Long update(
             ScheduleDetail scheduleDetail,
             ScheduleDetailReq scheduleDetailReq
