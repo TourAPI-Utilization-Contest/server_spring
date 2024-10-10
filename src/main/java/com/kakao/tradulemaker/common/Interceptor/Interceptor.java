@@ -41,14 +41,21 @@ public class Interceptor implements HandlerInterceptor {
           Object handler
   ) throws IOException {
 
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+      return true; // OPTIONS 요청은 그대로 허용
+    }
+
     String accessToken = request.getHeader("access_token");
     String refreshToken = request.getHeader("refresh_token");
 
     request.setAttribute(ACCESS_TOKEN, accessToken);
     request.setAttribute(REFRESH_TOKEN, refreshToken);
 
+    System.out.println("ACCESS_TOKEN: "+ accessToken);
+
     if (accessToken.equals(adminToken)) {
-      request.setAttribute(MEMBER_ID, 1L);
+      String memberId = request.getHeader("member_id");
+      request.setAttribute(MEMBER_ID, memberId);
       return true;
     };
 
