@@ -12,4 +12,6 @@ public class LoginTest {
     private String email;
 
     private String password;
+
+    private String nickname;
 }
