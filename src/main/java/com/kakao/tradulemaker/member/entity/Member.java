@@ -15,6 +15,7 @@ import java.util.List;
 public class Member {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
 //  For official test
@@ -30,6 +31,14 @@ public class Member {
   @Column(name = "access_token")
   private String accessToken;
 
+  @Column(name = "password")
+  private String password;
+
+  @Setter
+  @Column(name = "extra")
+  private String extra;
+
   @OneToMany(mappedBy = "member", orphanRemoval = true, cascade = CascadeType.ALL)
   private List<Schedule> schedules = new ArrayList<>();
+
 }
